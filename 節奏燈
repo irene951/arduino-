@@ -24,6 +24,6 @@ void loop() {
   FastLED.show();
   delay(1);
   fill_solid(leds, 60, CRGB::Black);
-  delay(100);
   FastLED.show();
+  delay(100);
   }
