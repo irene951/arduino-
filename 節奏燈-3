@@ -21,7 +21,7 @@ void ledturnoff(){
   for(vol;vol>0;vol--){
     fill_solid(leds+vol,1,CRGB::Black);
     FastLED.show();
-    delay(3);
+    delay(5);
   }
 }
 void setup() {
