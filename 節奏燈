@@ -9,6 +9,13 @@ CRGB leds[NUM_LEDS];            // 建立光带led
 int MIC=A0;  //聲音感測模組 AO 輸出接至 A0 腳
 int micVal;  //紀錄偵測到的音
 int vol;
+void ledturnoff(){
+  for(vol;vol>0;vol--){
+    fill_solid(leds+vol,1,CRGB::Black);
+    FastLED.show();
+    delay(3);
+  }
+}
 void setup() {
   Serial.begin(9600);
   LEDS.addLeds<LED_TYPE, LED_DT, COLOR_ORDER>(leds, NUM_LEDS);  // 初始化光带
@@ -17,13 +24,12 @@ void setup() {
 
 void loop() {
   micVal=analogRead(MIC);//讀取感測器輸出
-  vol=micVal/5;
+  vol=micVal/6;
   Serial.println(vol);
   delay(1);
   fill_solid(leds, vol, CRGB::YellowGreen);
   FastLED.show();
-  delay(1);
-  fill_solid(leds, 60, CRGB::Black);
-  FastLED.show();
-  delay(100);
+  delay(50);
+  ledturnoff();
+  
   }
