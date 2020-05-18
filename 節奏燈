@@ -1,0 +1,29 @@
+#include "FastLED.h"            // 此示例程序需要使用FastLED库
+ 
+#define NUM_LEDS 60             // LED灯珠数量
+#define LED_DT 9                // Arduino输出控制信号引脚
+#define LED_TYPE WS2812         // LED灯带型号
+#define COLOR_ORDER GRB     // RGB灯珠中红色、绿色、蓝色LED的排列顺序
+uint8_t max_bright = 10;       // LED亮度控制变量，可使用数值为 0 ～ 255， 数值越大则光带亮度越高
+CRGB leds[NUM_LEDS];            // 建立光带led
+int MIC=A0;  //聲音感測模組 AO 輸出接至 A0 腳
+int micVal;  //紀錄偵測到的音
+int vol;
+void setup() {
+  Serial.begin(9600);
+  LEDS.addLeds<LED_TYPE, LED_DT, COLOR_ORDER>(leds, NUM_LEDS);  // 初始化光带
+  FastLED.setBrightness(max_bright);                            // 设置光带亮度
+  }
+
+void loop() {
+  micVal=analogRead(MIC);//讀取感測器輸出
+  vol=micVal/5;
+  Serial.println(vol);
+  delay(1);
+  fill_solid(leds, vol, CRGB::YellowGreen);
+  FastLED.show();
+  delay(1);
+  fill_solid(leds, 60, CRGB::Black);
+  delay(100);
+  FastLED.show();
+  }
