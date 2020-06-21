@@ -29,6 +29,14 @@ void ledturnoff(){
     delay(5);
   }
 }
+void ledoperation(){
+  micVal=analogRead(MIC);
+  vol=micVal/6;
+  Serial.println(vol);
+  myHSVcolor.h++;
+  ledturnon();
+  ledturnoff(); 
+}
 void setup() {
   BT.begin(9600);  
   Serial.begin(9600);
@@ -53,18 +61,13 @@ void loop() {
       digitalWrite(LED, LOW);
     }
     while (state==1){
-      micVal=analogRead(MIC);
-      vol=micVal/6;
-      Serial.println(vol);
-      myHSVcolor.h++;
-      ledturnon();
-      ledturnoff(); 
-      if ((strsize=(BT.available()))>0){
-      for (int i=0; i<strsize; i++){
-        cmd[i]=char(BT.read());
+       ledoperation();
+       if ((strsize=(BT.available()))>0){
+        for (int i=0; i<strsize; i++){
+            cmd[i]=char(BT.read());
       }
     }
-      if (cmd[0]=='b'){
+       if (cmd[0]=='b'){
         state=0; 
       }
     }
