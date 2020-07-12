@@ -1,20 +1,21 @@
 #include <SoftwareSerial.h>
 #include <Wire.h>
 #include <Servo.h>
-#include "FastLED.h"            // 此示例程序需要使用FastLED库
-#define NUM_LEDS 60             // LED灯珠数量
-#define LED_DT 9                // Arduino输出控制信号引脚
-#define LED_TYPE WS2812         // LED灯带型号
-#define COLOR_ORDER GRB     // RGB灯珠中红色、绿色、蓝色LED的排列顺序
-uint8_t max_bright = 10;       // LED亮度控制变量，可使用数值为 0 ～ 255， 数值越大则光带亮度越高
-CRGB leds[NUM_LEDS];            // 建立光带led
-CHSV myHSVcolor(80,255,150);
-int MIC=A0;  //聲音感測模組 AO 輸出接至 A0 腳
-int micVal;  //紀錄偵測到的音
+#include "FastLED.h"            
+#define NUM_LEDS 60             
+#define LED_DT 7                
+#define LED_TYPE WS2812         
+#define COLOR_ORDER GRB     
+uint8_t max_bright = 10;        // LED亮度控制變量，可使用數值為 0 ～ 255， 數值越大光帶量度越高
+CRGB leds[NUM_LEDS];            // 建立LED光帶
+CHSV myHSVcolor(80,255,150);    // 可使LED的燈光顏色隨時間改變
+int MIC=A0;  
+int micVal;  
 int vol;
 SoftwareSerial BT(10,11); 
 int state=0;
 Servo servo1;
+/*----------控制LED燈條一次亮一顆，不斷累積，直到亮到指定數量------------------*/
 void ledturnon(){
  for(int a=1;vol>a;a++){
     fill_solid(leds,a,myHSVcolor);
@@ -22,6 +23,7 @@ void ledturnon(){
     delay(1);
   }
 }
+/*---------------------控制LED燈條依次變暗-------------------------------*/
 void ledturnoff(){
   for(vol;vol>0;vol--){
     fill_solid(leds+vol,1,CRGB::Black);
@@ -29,6 +31,7 @@ void ledturnoff(){
     delay(5);
   }
 }
+/*----------------讀取A0腳位所接收到的聲音傳感器數值，轉換成LED要亮的顆數，並執行函式ledturnon()、ledturnoff()---------*/
 void ledoperation(){
   micVal=analogRead(MIC);
   vol=micVal/6;
@@ -42,7 +45,7 @@ void setup() {
   Serial.begin(9600);
   LEDS.addLeds<LED_TYPE, LED_DT, COLOR_ORDER>(leds, NUM_LEDS);  // 初始化光带
   FastLED.setBrightness(max_bright);
-  servo1.attach(3);
+  servo1.attach(3);  // 宣告伺服馬達腳位
   servo1.write(1);
 }
  
@@ -51,12 +54,15 @@ void loop() {
   int strsize;
     if ((strsize=BT.available())>0){
       for (int i=0; i<strsize; i++){
-        cmd[i]=char(BT.read());
+        cmd[i]=char(BT.read()); // 接收手機所送字元
       }
     }
-    if (cmd[0]=='a'){
-      state=1;  
+    if (cmd[0]=='a'){  // 當ON被點選
+      state=1; 
       servo1.write(179);
+      delay(500);
+      servo1.write(1);
+      delay(500);
     }
     while (state==1){
        ledoperation();
@@ -65,9 +71,9 @@ void loop() {
             cmd[i]=char(BT.read());
          }
       }
-       if (cmd[0]=='b'){
+       
+       if (cmd[0]=='b'){ // 當OFF被點選，跳出while迴圈
         state=0; 
-        servo1.write(1);
       }
   }
     
